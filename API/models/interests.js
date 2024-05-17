@@ -6,9 +6,7 @@ const InterestSchema = new mongoose.Schema({
     required: true,
   },
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+    type: Array,
   },
   // Additional fields can be added here, such as timestamp of interest expression, etc.
 });
