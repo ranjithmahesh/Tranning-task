@@ -1,39 +1,77 @@
+import { validationResult } from "express-validator";
 import User from "../models/users.js";
+import jwt from "jsonwebtoken";
 
 export const createUse = async (req, res) => {
+  // Apply validation middleware
+  const result = validationResult(req);
+
+  console.log(result);
+  if (!result.isEmpty()) {
+    // If there are validation errors, return them immediately
+    return res.status(400).json({
+      errors: result.errors.map((item) => item.msg),
+    });
+  }
+
   const { username, email, password } = req.body;
+
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(400).json({ message: "User allready exist" });
+      return res.status(400).json({ message: "User already exists" });
     }
 
     const user = new User({ username, email, password });
-
     await user.save();
 
-    res.status(200).json({ message: "User create", user });
+    const token = jwt.sign({ id: user._id.toString() }, process.env.secretKey, {
+      expiresIn: "1hr",
+    });
+
+    res.status(200).json({ message: "User created", user, token });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).send("An error occurred while creating the user.");
   }
 };
 
 export const updateUse = async (req, res) => {
-  const { username, email, password } = req.body;
+  const result = validationResult(req);
 
+  // Simplified logging for production
+  if (!result.isEmpty()) {
+    console.log("Validation Errors:", result.array());
+    return res.status(400).json({
+      errors: result.array().map((err) => err.msg),
+    });
+  }
+
+  const { username, email, password } = req.body;
   const { id } = req.params;
+
   try {
     const user = await User.findByIdAndUpdate(
-      { _id: id },
+      id,
       { username, email, password },
       { new: true }
     );
 
-    res.status(200).json({ message: "User Updates", user });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "User Updated", user });
   } catch (error) {
-    console.log(error);
+    console.error("Update Error:", error.stack);
+    res
+      .status(500)
+      .send(
+        "An error occurred while updating the user. Please try again later."
+      );
   }
 };
+
 export const deleteUse = async (req, res) => {
   const { id } = req.params;
   try {
