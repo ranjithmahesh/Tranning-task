@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  LoginUse,
   createUse,
   deleteUse,
   getUse,
@@ -13,6 +14,7 @@ import {
 const router = express.Router();
 
 router.post("/create-user", CreateUserValidation(), createUse);
+router.post("/create-user/login", LoginUse);
 router.get("/create-user", getUse);
 router.put("/create-user/:id", updateUseUserValidation(), updateUse);
 router.delete("/create-user/:id", deleteUse);

@@ -73,3 +73,121 @@ export const updateUseUserValidation = () => {
       .withMessage("Password cannot be empty"),
   ];
 };
+
+export const CreateEventValidation = () => {
+  return [
+    param("organizerId")
+      .notEmpty()
+      .withMessage("id cannot be empty")
+      .isString()
+      .withMessage("id must be a string"),
+
+    body("title")
+      .isLength({ min: 5 })
+      .withMessage(
+        "title must be at least 5 characters and a maximum of 32 characters"
+      )
+      .notEmpty()
+      .withMessage("title cannot be empty")
+      .isString()
+      .withMessage("title must be a string"),
+
+    body("description")
+      .isLength({ min: 5 })
+      .withMessage(
+        "description must be at least 5 characters and a maximum of 32 characters"
+      )
+      .notEmpty()
+      .withMessage("description cannot be empty")
+      .isString()
+      .withMessage("description must be a string"),
+
+    body("startDate")
+      .notEmpty()
+      .withMessage("startDate cannot be empty")
+      .isDate()
+      .withMessage("startDate must be a Date"),
+
+    body("endDate")
+      .notEmpty()
+      .withMessage("endDate cannot be empty")
+      .isDate()
+      .withMessage("endDate must be a Date"),
+
+    body("location")
+      .isLength({ min: 5 })
+      .withMessage(
+        "location must be at least 5 characters and a maximum of 32 characters"
+      )
+      .notEmpty()
+      .withMessage("location cannot be empty")
+      .isString()
+      .withMessage("location must be a string"),
+  ];
+};
+export const updateEventValidation = () => {
+  return [
+    param("organizerId")
+      .notEmpty()
+      .withMessage("id cannot be empty")
+      .isString()
+      .withMessage("id must be a string"),
+
+    body("title")
+      .isLength({ min: 5 })
+      .withMessage(
+        "title must be at least 5 characters and a maximum of 32 characters"
+      )
+      .notEmpty()
+      .withMessage("title cannot be empty")
+      .isString()
+      .withMessage("title must be a string"),
+
+    body("description")
+      .isLength({ min: 5 })
+      .withMessage(
+        "description must be at least 5 characters and a maximum of 32 characters"
+      )
+      .notEmpty()
+      .withMessage("description cannot be empty")
+      .isString()
+      .withMessage("description must be a string"),
+
+    body("startDate")
+      .notEmpty()
+      .withMessage("startDate cannot be empty")
+      .isDate()
+      .withMessage("startDate must be a Date"),
+
+    body("endDate")
+      .notEmpty()
+      .withMessage("endDate cannot be empty")
+      .isDate()
+      .withMessage("endDate must be a Date"),
+
+    body("location")
+      .isLength({ min: 5 })
+      .withMessage(
+        "location must be at least 5 characters and a maximum of 32 characters"
+      )
+      .notEmpty()
+      .withMessage("location cannot be empty")
+      .isString()
+      .withMessage("location must be a string"),
+  ];
+};
+export const createInterestValidation = () => {
+  return [
+    param("eventId")
+      .notEmpty()
+      .withMessage("eventId cannot be empty")
+      .isString()
+      .withMessage("eventId must be a string"),
+
+    body("userId")
+      .notEmpty()
+      .withMessage("userId cannot be empty")
+      .isString()
+      .withMessage("userId  must be a string"),
+  ];
+};

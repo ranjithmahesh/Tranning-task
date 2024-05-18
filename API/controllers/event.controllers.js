@@ -1,7 +1,15 @@
+import { validationResult } from "express-validator";
 import Event from "../models/event.js";
 import User from "../models/users.js";
 
 export const createEvent = async (req, res) => {
+  const result = validationResult(req);
+  console.log(result);
+  if (!result.isEmpty()) {
+    return res
+      .status(400)
+      .json({ errors: result.errors.map((item) => item.msg) });
+  }
   try {
     const { title, description, startDate, endDate, location } = req.body;
     const { organizerId } = req.params;
@@ -42,24 +50,38 @@ export const getAllEvent = async (req, res) => {
 };
 
 export const updateEvent = async (req, res) => {
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    return res
+      .status(400)
+      .json({ errors: result.array().map((err) => err.msg) });
+  }
+
   try {
     const { title, description, startDate, endDate, location } = req.body;
     const { organizerId } = req.params;
-    console.log(organizerId);
 
     const newEvent = await Event.findByIdAndUpdate(
-      { _id: organizerId },
-      {
-        title,
-        description,
-        startDate,
-        endDate,
-        location,
-      },
+      organizerId,
+      { title, description, startDate, endDate, location },
       { new: true }
     );
 
-    res.status(201).json(newEvent); // Return the newly created event
+    const count = newEvent.Interest.length;
+    const userPromis = newEvent.Interest.map(async (userId) => {
+      const user = await User.findById(userId);
+      return user ? user.toObject() : null;
+    });
+
+    const userDetails = await Promise.all(userPromis);
+
+    const filtreduserDetails = userDetails.filter((item) => item !== null);
+    const data = {
+      "Count of Intrested Users": count,
+      ...newEvent._doc,
+      Interest: filtreduserDetails,
+    };
+    res.status(200).json(data); // Corrected status code to 200
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
@@ -82,6 +104,13 @@ export const deleteEvent = async (req, res) => {
 };
 
 export const createInterest = async (req, res) => {
+  const result = validationResult(req);
+
+  if (!result.isEmpty()) {
+    return res
+      .status(400)
+      .json({ error: result.array().map((item) => item.msg) });
+  }
   try {
     const { eventId } = req.params;
     const { userId } = req.body;
@@ -117,7 +146,7 @@ export const createInterest = async (req, res) => {
 
     const data = { ...newIntrest._doc, Interest: filteredUsersDetails };
     console.log(data);
-    res.status(201).json({ data });
+    res.status(201).json(data);
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");

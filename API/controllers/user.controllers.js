@@ -1,12 +1,12 @@
 import { validationResult } from "express-validator";
 import User from "../models/users.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 export const createUse = async (req, res) => {
   // Apply validation middleware
   const result = validationResult(req);
 
-  console.log(result);
   if (!result.isEmpty()) {
     // If there are validation errors, return them immediately
     return res.status(400).json({
@@ -15,14 +15,16 @@ export const createUse = async (req, res) => {
   }
 
   const { username, email, password } = req.body;
+  const excriptedPassword = bcrypt.hashSync(password, 10);
 
+  console.log(excriptedPassword, "excriptedPassword");
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = new User({ username, email, password });
+    const user = new User({ username, email, password: excriptedPassword });
     await user.save();
 
     const token = jwt.sign({ id: user._id.toString() }, process.env.secretKey, {
@@ -33,6 +35,29 @@ export const createUse = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("An error occurred while creating the user.");
+  }
+};
+
+export const LoginUse = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) {
+      res.status(400).json({ message: "User not found" });
+    }
+
+    const decodePassword = bcrypt.compareSync(password, existingUser.password);
+
+    if (!decodePassword) {
+      res.status(400).json({ message: "User password worng" });
+    }
+
+    const token = jwt.sign({ id: existingUser._id }, process.env.secretKey, {
+      expiresIn: "1hr",
+    });
+    res.status(200).json(token);
+  } catch (error) {
+    console.log(error);
   }
 };
 
