@@ -28,6 +28,8 @@ const EventSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  Interest: { type: Array },
+
   // Optional fields can be added here, such as tags, categories, etc.
 });
 

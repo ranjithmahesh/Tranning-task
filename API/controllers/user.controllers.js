@@ -1,4 +1,3 @@
-import Interest from "../models/interests.js";
 import User from "../models/users.js";
 
 export const createUse = async (req, res) => {
